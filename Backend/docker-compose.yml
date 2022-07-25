@@ -1,0 +1,57 @@
+version: '3.2'
+services:
+  app:
+    build:
+      context: ./.docker
+      dockerfile: app.dockerfile    
+      args:
+        - UID=$USUID
+        - GID=$GRPID
+    container_name: customers-app
+    user: "$USUID:$GRPID"
+    volumes:
+      - './:/var/www'      
+    working_dir: /var/www
+    networks:
+      - network_project
+  web:
+    build:
+      context: ./.docker
+      dockerfile: web.dockerfile
+    container_name: customers-web
+    volumes:
+      - './:/var/www'
+    working_dir: /var/www
+    ports:
+      - '8080:80'
+    networks:
+      - network_project
+  db:
+    build:
+      context: ./.docker
+      dockerfile: db.dockerfile
+    container_name: customers-db      
+    ports:
+      - '33006:3306'
+    environment:
+      - TZ=America/Sao_Paulo
+      - MYSQL_ROOT_PASSWORD=root123
+      - MYSQL_DATABASE=project_give_local_docker
+      - MYSQL_USER=projectgive
+      - MYSQL_PASSWORD=projectgive123
+    volumes:
+      - db_dados:/var/lib/mysql
+    networks:
+      - network_project
+  cache:
+    image: redis:alpine
+    networks:
+      - network_project
+
+networks:
+  network_project:
+    driver: bridge
+
+volumes:
+    db_dados:
+      driver: local    

@@ -1,0 +1,1 @@
+CREATE DATABASE IF NOT EXISTS `project_give_local_docker`;
